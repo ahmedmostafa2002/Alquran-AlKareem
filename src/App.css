@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Uthmani';
+    src: url('./assets/fonts/Othmani.ttf')
+    format("tff")
+}
+
+body {
+  font-family: 'Uthmani', sans-serif;
+}
