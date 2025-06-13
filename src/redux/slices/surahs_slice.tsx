@@ -1,9 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import SurahProps from "../../utils/interfaces/surah.interface";
 
 export const getSurahs = createAsyncThunk("surahs/getSurahs", async (number:number) => {
-    const response = await axios.get(`http://api.alquran.cloud/v1/surah/${number}/editions/quran-uthmani,en.sahih`);
-    return response.data;
+    // const response = await axios.get(`https://api.alquran.cloud/v1/surah/${number}/editions/quran-uthmani,en.sahih`);
+    const response = await axios.get(`http://localhost:3000/surah/${number}`);
+    return response.data.data;
 });
 
 export const getSurahsDetails = createAsyncThunk("surahs/getSurahsDetails", async () => {
@@ -15,7 +17,7 @@ const surahsSlice = createSlice({
     name: "surahs",
     initialState: {
         surahsDetails:[],
-        surahs: [],
+        surah:{number:0} as SurahProps,
         status: "idle",
         error: false
     },
@@ -26,7 +28,7 @@ const surahsSlice = createSlice({
         });
         builder.addCase(getSurahs.fulfilled,(state,action)=>{
             state.status = "succeeded";
-            state.surahs = action.payload.data;
+            state.surah = action.payload;
         });
         builder.addCase(getSurahs.rejected,(state)=>{
             state.status = "failed";

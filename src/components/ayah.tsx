@@ -4,19 +4,41 @@ import PauseOutlinedIcon from '@mui/icons-material/PauseOutlined';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-import { useState, useEffect } from "react"; // Import useEffect
+import { useState, useEffect, useRef } from "react"; // Import useEffect
 import axios from "axios";
 
-function Ayah(props:{ayah:AyahProp,englishText:string}){
-    const {ayah,englishText} = props;
+function Ayah(ayah:AyahProp){
     const fSize = useSelector((state:RootState)=>state.Font.fontSize);
     const surahNumber = useSelector((state:RootState)=>state.CurrentSurah.number);
     const [tafsirText , setTafsirText] = useState("");
     const [currentTafsir , setCurrentTafsir] = useState(1);
     const [audioOn,toggleAudio] = useState(false);
 
-    const handleAudio = ()=>{
-        toggleAudio(!audioOn);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const theme = useSelector((state:RootState)=>state.Theme.theme);
+    const dark = theme === "dark";
+    
+
+    const handleAudio = (audioLink:string)=>{
+        if(!audioRef.current){
+            // audioRef.current = new Audio(`https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayah.number.inQuran}.mp3`);
+            audioRef.current = new Audio(audioLink);
+            audioRef.current.onended = ()=>{
+                toggleAudio(false);
+            }
+        };
+
+        if(audioOn){
+            audioRef.current.pause();
+            toggleAudio(false);
+        }else{
+            audioRef.current.play().catch(error=>{
+                console.log("Error playing audio: ",error)
+            });
+            toggleAudio(true);
+        }
+        // toggleAudio(!audioOn);
+        // https://cdn.islamic.network/quran/audio/128/ar.alafasy/262.mp3
     }
 
     const [tafsirOpen,toggleTafsir] = useState(false);
@@ -40,79 +62,65 @@ function Ayah(props:{ayah:AyahProp,englishText:string}){
     }
     useEffect(() => {
         if (tafsirOpen) {
-            fetchTafsir(currentTafsir, surahNumber, ayah.numberInSurah);
+            fetchTafsir(currentTafsir, surahNumber, ayah.number.inSurah);
         } else {
             setTafsirText("");
         }
-    }, [tafsirOpen, currentTafsir, surahNumber, ayah.numberInSurah]);
+    }, [tafsirOpen, currentTafsir, surahNumber, ayah.number.inSurah]);
+
+    useEffect(()=>{
+        return ()=>{
+            if(audioRef.current){
+                audioRef.current.pause();
+                toggleAudio(false);
+                audioRef.current = null;
+            }
+        }
+    },[ayah.number]);
 
 
     const tafsirList = [
-        {
-        "id": 1,
-        "name": "الميسر",
-        },
-        {
-        "id": 2,
-        "name": "الجلالين",
-        },
-        {
-        "id": 3,
-        "name": "السعدي",
-        },
-        {
-        "id": 4,
-        "name": "ابن كثير",
-        },
-        {
-        "id": 5,
-        "name": "الوسيط لطنطاوي",
-        },
-        {
-        "id": 6,
-        "name": "البغوي",
-        },
-        {
-        "id": 7,
-        "name": "القرطبي",
-        },
-        {
-        "id": 8,
-        "name": "الطبري",
-        }
-    ]
+        { "id": 1, "name": "الميسر" },
+        { "id": 2, "name": "الجلالين" },
+        { "id": 3, "name": "السعدي" },
+        { "id": 4, "name": "ابن كثير" },
+        { "id": 5, "name": "الوسيط لطنطاوي" },
+        { "id": 6, "name": "البغوي" },
+        { "id": 7, "name": "القرطبي" },
+        { "id": 8, "name": "الطبري" }
+    ];
 
     return (
-        <div className={`flex flex-col items-center justify-center  gap-4 py-10 px-8 rounded-lg bg-white shadow-md hover:shadow-none transition-all duration-500`}>
+        <div className={`flex flex-col items-center justify-center  gap-4 py-10 px-8 rounded-lg ${dark?"bg-gray-700/70":"bg-white"} shadow-md hover:shadow-none transition-all duration-500`}>
            <div className="flex justify-between gap-4 items-center w-full">
             <span className="flex justify-center items-center text-lg font-bold text-white h-12 w-12 rounded-full bg-gradient-to-r from-blue-400 via-blue-600 to-blue-800">
-                {ayah.numberInSurah}
+                {ayah.number.inSurah}
             </span>
             <div className="flex items-center w-fit gap-4">
-                <p className="font-semibold text-right text-purple-900 w-fit" dir="rtl" style={{fontSize:fSize}}>{ayah.text}</p>
-                <span onClick={handleAudio} className={`flex justify-center items-center h-12 w-12 rounded-lg ${audioOn?"bg-blue-50":"bg-white"} border-2 border-blue-200 cursor-pointer transition-all duration-500 hover:bg-blue-50`}>
+                <p className={`font-semibold text-right ${dark?"text-purple-100":"text-purple-900"} w-fit`} dir="rtl" style={{fontSize:fSize}}>{ayah.text.arab}</p>
+                <span onClick={()=>handleAudio(ayah.audio.primary)} className={`flex justify-center items-center h-12 w-12 rounded-lg ${audioOn?"bg-blue-50":"bg-white"} border-2 border-blue-200 cursor-pointer transition-all duration-500 hover:bg-blue-50`}>
                     {audioOn?<PauseOutlinedIcon className="text-2xl text-purple-800"/>:<PlayArrowOutlinedIcon className="text-2xl text-purple-800"/>}
                 </span>
             </div>
            </div>
-                <p className="font-semibold text-blue-700 ms-20" style={{fontSize:fSize}}>{englishText}</p>
+                <p className={`font-semibold ${dark?"text-blue-200":"text-blue-700"} ms-20`} style={{fontSize:fSize}}>{ayah.translation.en}</p>
            <div className="flex  justify-between items-center gap-4 w-full">
-                <span className="font-medium  text-lg bg-gradient-to-r from-indigo-500 via-indigo-500 to-indigo-500 text-white py-0.5 px-8 rounded-full" dir="rtl">page: {ayah.page} - juz: {ayah.juz}</span>
+                <span className="font-medium  text-lg bg-gradient-to-r from-indigo-500 via-indigo-500 to-indigo-500 text-white py-0.5 px-8 rounded-full" dir="rtl">page: {ayah.meta.page} - juz: {ayah.meta.juz}</span>
                 <span onClick={handleTafsir} className={`flex justify-center items-center h-12 w-12 rounded-lg ${tafsirOpen?"bg-blue-50":"bg-white"} border-2 border-blue-200 cursor-pointer transition-all duration-500 hover:bg-blue-50`}>
                     <MenuBookOutlinedIcon className="text-2xl text-purple-800"/>
             </span>
             </div>
             <div className={`w-full  transition-all duration-500 ${tafsirOpen?"block":"hidden"}`} dir="rtl" >
-            <div className="w-full flex flex-col items-start gap-4 px-4 py-3 bg-purple-100 rounded-lg border-r-4 border-purple-600">
+            <div className={`w-full flex flex-col items-start gap-4 px-4 py-3 ${dark?"bg-blue-950":"bg-purple-100"} rounded-lg border-r-4 border-purple-600 transition-all duration-500`}>
                 <div className="flex items-center gap-3 flex-wrap">
-                    <MenuBookOutlinedIcon className="text-2xl text-purple-600" sx={{fontSize:fSize}}/>
-                    <p className="font-semibold text-purple-600" style={{fontSize:fSize}}>تفسير</p>
+                    <MenuBookOutlinedIcon className={`text-2xl ${dark?"text-purple-200":"text-purple-600"}`} sx={{fontSize:fSize}}/>
+                    <p className={`font-semibold ${dark?"text-purple-200":"text-purple-600"}`} style={{fontSize:fSize}}>تفسير</p>
                     {tafsirList.map((tafsir)=>
                     <div key={tafsir.id} onClick={()=>{handleCurrentTafsir(tafsir.id)}} className={`py-1 px-6 ${currentTafsir === tafsir.id?"bg-purple-300":"bg-blue-300"} cursor-pointer rounded-full`}>
-                        <p className="text-lg text-purple-700">{tafsir.name}</p>
+                        <p className={`text-lg ${dark?"text-blue-950":"text-purple-700"}`}>{tafsir.name}</p>
                         </div>)}
                 </div>
-                <p className="font-semibold text-purple-600 text-right" style={{fontSize:fSize}}>{tafsirText || "Loading tafsir..."}</p> 
+                <p className={`font-semibold ${dark?"text-indigo-200":"text-purple-600"} text-right`} style={{fontSize:fSize}}>{tafsirText || "Loading tafsir..."}</p> 
             </div>
             </div>
         </div>
