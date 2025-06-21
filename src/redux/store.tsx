@@ -4,6 +4,7 @@ import FontSizeReducer from "./slices/fontsize_slice";
 import SideBarReducer from "./slices/sidebar_slice";
 import CurrentSurahReducer from "./slices/current_surah_slice";
 import SurahsReducer from "./slices/surahs_slice";
+import PathReducer from "./slices/current_path_slice";
 
 const store = configureStore({
     reducer:{
@@ -12,6 +13,7 @@ const store = configureStore({
         SideBar:SideBarReducer,
         CurrentSurah:CurrentSurahReducer,
         Surah:SurahsReducer,
+        CurrentPath:PathReducer,
     }
 });
 

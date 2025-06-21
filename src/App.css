@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap'); /* Example Arabic font */
 @font-face {
     font-family: 'Uthmani';
     src: url('./assets/fonts/Othmani.ttf')
@@ -5,5 +6,9 @@
 }
 
 body {
-  font-family: 'Uthmani', sans-serif;
+  /* font-family: 'Uthmani', sans-serif; */
+  font-family: 'Noto Naskh Arabic', sans-serif; /* Or your preferred Arabic font */
+
 }
+
+

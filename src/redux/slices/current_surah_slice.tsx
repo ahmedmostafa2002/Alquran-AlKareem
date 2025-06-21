@@ -6,10 +6,10 @@ const getInitialCurrentSurahNumber =  ():number=>{
         if(currentSurahNumber){
             return parseInt(currentSurahNumber);
         }else{
-            return 1;
+            return 0;
         }
     }else{
-        return 1;
+        return 0;
     }
 }
 

@@ -37,14 +37,17 @@ function SideBar() {
 
   useEffect(() => {
     if ((isOpen || drawerOpen) && surahs.length > 0 && currentSurahNumber) {
+      const sidebarContent = document.querySelector(".sidebar-content"); // Add this class to your sidebar's content container
       const currentSurahElement = document.getElementById(`surah-${currentSurahNumber}`);
-      if (currentSurahElement) {
-        setTimeout(() => {
-          currentSurahElement.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
+      
+      if (sidebarContent && currentSurahElement) {
+          const sidebarRect = sidebarContent.getBoundingClientRect();
+          const elementRect = currentSurahElement.getBoundingClientRect();
+          
+          sidebarContent.scrollTo({
+              top: elementRect.top - sidebarRect.top + sidebarContent.scrollTop,
+              behavior: "smooth"
           });
-        }, 300);
       }
     }
   }, [isOpen, drawerOpen, currentSurahNumber, surahs]); // Add isDrawer to dependencies
@@ -64,6 +67,28 @@ function SideBar() {
 };
 
 
+
+  const handleClearSearch = () => {
+    setSearchText('');
+    
+    // Wait for next frame to ensure DOM is updated
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        const sidebarContent = document.querySelector(".sidebar-content");
+        const currentSurahElement = document.getElementById(`surah-${currentSurahNumber}`);
+        
+        if (sidebarContent && currentSurahElement) {
+          const sidebarRect = sidebarContent.getBoundingClientRect();
+          const elementRect = currentSurahElement.getBoundingClientRect();
+          
+          sidebarContent.scrollTo({
+            top: elementRect.top - sidebarRect.top + sidebarContent.scrollTop,
+            behavior: "smooth"
+          });
+        }
+      }, 300); // Increased timeout
+    });
+  };
 
   return (
     <>
@@ -90,13 +115,13 @@ function SideBar() {
           type="text"
           value={searchText}
           onChange={handleSearch}
-          className={`px-4 py-2 border-2 border-blue-200 outline-none ${dark?"text-white":"text-purple-900"} rounded-md w-full pl-10 pr-10`} // Added pr-10 for space
+          className={`px-4 py-2 border-2 border-blue-200 outline-none ${dark?"text-white":"text-purple-900"} rounded-md w-full pl-10 pr-10`}
           placeholder='Search Surah...'
         />
         {searchText && (
           <CloseIcon
             className='absolute right-3 text-gray-500 cursor-pointer'
-            onClick={()=>setSearchText('')}
+            onClick={handleClearSearch} // Change this line to use the new handler
           />
         )}
       </div>
@@ -107,7 +132,7 @@ function SideBar() {
        <div className="flex justify-center items-center"><SimpleBackdrop/></div>:
        surahsStatus === "failed"?
        <div className="flex justify-center items-center font-semibold text-lg  text-red-600">Something Went Wrong Please Visit US later!</div>:
-      <div className='flex flex-col gap-2 px-4 pb-20 w-full flex-1 overflow-y-auto max-h-[61vh]'> {/* Added flex-1 */}
+      <div className='flex flex-col gap-2 px-4 pb-20 w-full flex-1 sidebar-content overflow-y-auto max-h-[61vh]'> {/* Added flex-1 */}
         {surahs.map((surah)=>(
           (normalizeArabic(surah.name).includes(normalizeArabic(searchText))||surah.englishName.toLowerCase().includes(searchText.toLowerCase()))&&
           <SurahDetails  key={uuid()} {...surah} />

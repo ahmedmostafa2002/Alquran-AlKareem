@@ -14,7 +14,7 @@ function Surah() {
   const isSidebarOpen = useSelector((state:RootState)=>state.SideBar.isOpen);
     const sidebarOffsetClasses = isSidebarOpen
     ? 'w-full lg:w-2/3 xl:w-3/4 lg:ms-[33.3%] xl:ms-[25%]'
-    : 'w-full left-0'; 
+    : 'w-full left-0';
       const surahNumber = useSelector((state:RootState)=>state.CurrentSurah.number);
       const surah:SurahProps = useSelector((state:RootState)=>state.Surah.surah);
       const surahsStatus = useSelector((state:RootState)=>state.Surah.status);
@@ -22,66 +22,77 @@ function Surah() {
       const dark = theme === "dark";
 
       const dispatch = useDispatch<AppDispatch>();
+      const currentPath = useSelector((state: RootState) => state.CurrentPath.path);
 
-      // New useEffect to handle data fetching and scrolling when surahNumber changes
+
+
+      // useEffect to handle data fetching and scrolling when surahNumber changes
       useEffect(() => {
         if (surahNumber > 0) { // Ensure surahNumber is valid before fetching
           dispatch(getSurahs(surahNumber));
         }
+        
         window.scrollTo({
           top: 0,
           behavior: "smooth"
         });
-      }, [dispatch, surahNumber]); // Re-run when surahNumber or dispatch changes
+      }, [currentPath, dispatch, surahNumber]); 
 
-      const handleNextSurah = ()=>{
+
+      const handleNextSurah = async () => {
         if (surahNumber < 114) {
-          dispatch(setCurrentSurah(surahNumber+1));
-          // Fetching and page scrolling are now handled by the useEffect above
+          dispatch(setCurrentSurah(surahNumber + 1));
+          await dispatch(getSurahs(surahNumber + 1));
 
-          // Sidebar scroll logic (ensure surahNumber is used for the ID)
-          const sidebar:HTMLElement|null = document.querySelector("#sidebar");
-          const nextSurahNumber = surahNumber + 1;
-          const currentSurahElement:HTMLElement|null = document.getElementById(`surah-${nextSurahNumber}`);
-          if (sidebar && currentSurahElement) {
-              setTimeout(() => {
-                currentSurahElement.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
-              }, 300); // تأخير لضمان تحميل العناصر بالكامل
+          // Scroll main content to top
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
+
+          // Scroll sidebar to next surah
+          const sidebarContent = document.querySelector(".sidebar-content");
+          const nextSurahElement = document.getElementById(`surah-${surahNumber + 1}`);
+
+          if (sidebarContent && nextSurahElement) {
+            const sidebarRect = sidebarContent.getBoundingClientRect();
+            const elementRect = nextSurahElement.getBoundingClientRect();
+
+            sidebarContent.scrollTo({
+              top: elementRect.top - sidebarRect.top + sidebarContent.scrollTop,
+              behavior: "smooth"
+            });
           }
         }
       }
 
-      const handlePreviousSurah = ()=>{
+      const handlePreviousSurah = async () => {
         if (surahNumber > 1) {
-          dispatch(setCurrentSurah(surahNumber-1));
-          const sidebar:HTMLElement|null = document.querySelector("#sidebar");
-          const prevSurahNumber = surahNumber - 1;
-          const currentSurahElement:HTMLElement|null = document.getElementById(`surah-${prevSurahNumber}`);
-          if (sidebar && currentSurahElement) {
-              setTimeout(() => {
-                currentSurahElement.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
-              }, 300);
+          dispatch(setCurrentSurah(surahNumber - 1));
+          await dispatch(getSurahs(surahNumber - 1));
+
+          // Scroll main content to top
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
+
+          // Scroll sidebar to previous surah
+          const sidebarContent = document.querySelector(".sidebar-content");
+          const prevSurahElement = document.getElementById(`surah-${surahNumber - 1}`);
+
+          if (sidebarContent && prevSurahElement) {
+            const sidebarRect = sidebarContent.getBoundingClientRect();
+            const elementRect = prevSurahElement.getBoundingClientRect();
+
+            sidebarContent.scrollTo({
+              top: elementRect.top - sidebarRect.top + sidebarContent.scrollTop,
+              behavior: "smooth"
+            });
           }
         }
       }
 
-      // The old useEffect for fetching is replaced by the new one above.
-      // useEffect(()=>{
-      //   if (surahsStatus === 'idle') {
-      //     dispatch(getSurahs(surahNumber));
-      //     console.log(surah);
-      //   }
-      // },[dispatch, surahsStatus , surahNumber,surah]);
-
-      // Updated loading condition for clarity and safety, assuming surah.number === 0 is a valid initial/empty state.
-      // Also check if surah itself is available if it can be null/undefined initially.
-      // If surah is typed as SurahProps (not SurahProps | null), then surah.number check is primary.
       if (surahsStatus === 'loading' || (surah && surah.number === 0 && surahNumber !== 0)) {
         return <div className="flex justify-center items-center h-screen"><SimpleBackdrop/></div>;
       }
@@ -89,7 +100,9 @@ function Surah() {
       if (surahsStatus === 'failed') {
           return <div className="flex justify-center items-center font-semibold text-lg h-screen text-red-600">Something Went Wrong Please Visit US later!</div>;
       }
-      
+      if(surahsStatus==="succeeded" && currentPath === "/surahs"){
+        dispatch(setCurrentSurah(surah.number));
+      }
       return (
           <div className={`flex flex-col ${sidebarOffsetClasses} ${dark?"bg-gradient-to-r from-slate-900 via-gray-900 to-indigo-950":""} gap-4 px-0 sm:px-10 py-28`}>
               <SurahTitle name={surah.name.transliteration.en} arabicName={surah.name.long}></SurahTitle>

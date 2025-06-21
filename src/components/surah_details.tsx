@@ -13,24 +13,31 @@ const currentSurah = useSelector((state:RootState)=>state.CurrentSurah.number);
 const theme = useSelector((state:RootState)=>state.Theme.theme);
 const dark = theme === "dark"?true:false;
 
-const handleOnClick  = ()=>{
+const handleOnClick = async () => {
     dispatch(setCurrentSurah(surah.number)); 
-    dispatch(getSurahs(surah.number));
+    await dispatch(getSurahs(surah.number));
+    
+    // Scroll main content to top
     window.scrollTo({
-        top:0,
-        behavior:"smooth"
+        top: 0,
+        behavior: "smooth"
     });
-    const sidebar:HTMLElement|null = document.querySelector("#sidebar"); // تأكد من أن لديك id لهذا العنصر في Sidebar
-    const currentSurahElement:HTMLElement|null = document.getElementById(`surah-${surah.number}`);;
-    if (sidebar && currentSurahElement) {
-        setTimeout(() => {
-          currentSurahElement.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }, 300);
-      }
-      dispatch(closeDrawer())
+    
+    // Scroll sidebar to the selected surah
+    const sidebarContent = document.querySelector(".sidebar-content"); // Add this class to your sidebar's content container
+    const currentSurahElement = document.getElementById(`surah-${surah.number}`);
+    
+    if (sidebarContent && currentSurahElement) {
+        const sidebarRect = sidebarContent.getBoundingClientRect();
+        const elementRect = currentSurahElement.getBoundingClientRect();
+        
+        sidebarContent.scrollTo({
+            top: elementRect.top - sidebarRect.top + sidebarContent.scrollTop,
+            behavior: "smooth"
+        });
+    }
+    
+    dispatch(closeDrawer());
 }
 
 const backGround = `${surah.number === currentSurah? dark? "bg-gradient-to-r from-purple-800/50 to-blue-800/50" : "bg-blue-100" : "white"}`
