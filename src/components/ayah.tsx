@@ -45,11 +45,16 @@ function Ayah(ayah:AyahProp){
 
     const fetchTafsir = async (tafseerId: number, surahNum: number, ayahNum: number) => {
         try {
-            const response = await axios.get(`http://api.quran-tafseer.com/tafseer/${tafseerId}/${surahNum}/${ayahNum}`);
+            const response = await axios.get(`https://api.quran-tafseer.com/tafseer/${tafseerId}/${surahNum}/${ayahNum}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
             setTafsirText(response.data.text);
         } catch (error) {
             console.error("Error fetching tafsir:", error);
-            setTafsirText("Failed to load tafsir.");
+            setTafsirText("عذراً، لا يمكن تحميل التفسير حالياً. يرجى المحاولة مرة أخرى لاحقاً.");
         }
     };
 
