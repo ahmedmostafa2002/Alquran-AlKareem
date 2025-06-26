@@ -37,16 +37,14 @@ function Ayah(ayah:AyahProp){
             });
             toggleAudio(true);
         }
-        // toggleAudio(!audioOn);
-        // https://cdn.islamic.network/quran/audio/128/ar.alafasy/262.mp3
+       
     }
 
     const [tafsirOpen,toggleTafsir] = useState(false);
 
     const fetchTafsir = async (tafseerId: number, surahNum: number, ayahNum: number) => {
         try {
-            // const response = await axios.get(`http://api.quran-tafseer.com/tafseer/${tafseerId}/${surahNum}/${ayahNum}`);
-            const response = await axios.get(`http://localhost:3000/tafseer/${tafseerId}/${surahNum}/${ayahNum}`);
+            const response = await axios.get(`https://quran-api-ruby.vercel.app/tafseer/${tafseerId}/${surahNum}/${ayahNum}`);
             setTafsirText(response.data.text);
         } catch (error) {
             console.error("Error fetching tafsir:", error);
