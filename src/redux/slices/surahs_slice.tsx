@@ -4,7 +4,7 @@ import SurahProps from "../../utils/interfaces/surah.interface";
 
 export const getSurahs = createAsyncThunk("surahs/getSurahs", async (number:number) => {
     // const response = await axios.get(`https://api.alquran.cloud/v1/surah/${number}/editions/quran-uthmani,en.sahih`);
-    const response = await axios.get(`https://quran-api-ruby.vercel.app//surah/${number}`);
+    const response = await axios.get(`https://quran-api-swart-three.vercel.app/surah/${number}`);
     return response.data.data;
 });
 

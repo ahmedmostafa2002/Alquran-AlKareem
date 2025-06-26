@@ -44,7 +44,7 @@ function Ayah(ayah:AyahProp){
 
     const fetchTafsir = async (tafseerId: number, surahNum: number, ayahNum: number) => {
         try {
-            const response = await axios.get(`https://quran-api-ruby.vercel.app/tafseer/${tafseerId}/${surahNum}/${ayahNum}`);
+            const response = await axios.get(`https://quran-api-swart-three.vercel.app/tafseer/${tafseerId}/${surahNum}/${ayahNum}`);
             setTafsirText(response.data.text);
         } catch (error) {
             console.error("Error fetching tafsir:", error);
