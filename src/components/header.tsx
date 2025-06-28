@@ -12,6 +12,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { Link, useLocation} from 'react-router-dom';
 import { setCurrentSurah } from '../redux/slices/current_surah_slice';
 import { setCurrentPath } from '../redux/slices/current_path_slice';
+import { useEffect, useState } from 'react';
 
 function Header(){
 
@@ -33,6 +34,21 @@ function Header(){
     dispatch(setCurrentSurah(0));
     dispatch(setCurrentPath("/"));
   }
+
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsSmallScreen(window.innerWidth <= 500);
+    };
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []); 
+
+
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -64,7 +80,7 @@ function Header(){
       <IconButton onClick={handleTheme}>
         {theme === "light" ? <BedtimeOutlinedIcon/> : <LightModeOutlinedIcon sx={{color:'white'}}/>}
       </IconButton>
-      <div className={`flex justify-center items-center gap-3 px-8 py-1 rounded-full ${dark?"bg-linear-to-r from-purple-900 to-indigo-800":"bg-linear-to-r from-indigo-50 via-blue-100 to-indigo-50"}`}>
+      <div className={`${isSmallScreen ? "hidden":"flex"} justify-center items-center gap-3 px-8 py-1 rounded-full ${dark?"bg-linear-to-r from-purple-900 to-indigo-800":"bg-linear-to-r from-indigo-50 via-blue-100 to-indigo-50"}`}>
       <span className='bg-green-500 h-2 w-2 rounded-full animate-pulse'></span>
       <h3 className={`${dark?"bg-gradient-to-r from-purple-200 via-purple-200 to-indigo-100":"bg-gradient-to-r from-purple-600 via-purple-600 to-indigo-700"} bg-clip-text text-transparent`}>
         Reading Mode

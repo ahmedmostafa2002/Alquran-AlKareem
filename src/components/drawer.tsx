@@ -24,6 +24,7 @@ function MyDrawer(){
         window.addEventListener('resize', handleResize);
 
         handleResize();
+        
 
         return () => {
             window.removeEventListener('resize', handleResize);
@@ -31,7 +32,8 @@ function MyDrawer(){
     }, [drawerOpen, dispatch]); 
 
     return (
-        <Drawer open={drawerOpen} onClose={handleClose} className="lg:hidden" sx={{zIndex:3}}>
+        <Drawer
+         open={drawerOpen} onClose={handleClose} className="lg:hidden" sx={{zIndex:3}}>
          <SideBar></SideBar>
         </Drawer>
     )

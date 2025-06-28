@@ -59,6 +59,18 @@ function Ayah(ayah:AyahProp){
     const handleCurrentTafsir = (id:number)=>{
         setCurrentTafsir(id);
     }
+    const [isSmallScreen, setIsSmallScreen] = useState(false);
+    useEffect(() => {
+        const checkScreenSize = () => {
+            setIsSmallScreen(window.innerWidth <= 500);
+        };
+        checkScreenSize();
+        window.addEventListener('resize', checkScreenSize);
+        return () => {
+            window.removeEventListener('resize', checkScreenSize);
+        };
+    }, []);
+
     useEffect(() => {
         if (tafsirOpen) {
             fetchTafsir(currentTafsir, surahNumber, ayah.number.inSurah);
@@ -90,8 +102,8 @@ function Ayah(ayah:AyahProp){
     ];
 
     return (
-        <div className={`flex flex-col items-center justify-center  gap-4 py-10 px-8 rounded-lg ${dark?"bg-gray-700/70":"bg-white"} shadow-md hover:shadow-none transition-all duration-500`}>
-           <div className="flex justify-between gap-4 items-center w-full">
+        <div className={`relative flex flex-col items-center justify-center  gap-4 py-10 px-8 rounded-lg ${dark?"bg-gray-700/70":"bg-white"} shadow-md hover:shadow-none transition-all duration-500`}>
+           <div className={`flex ${isSmallScreen?"flex-col":"flex-row"} justify-between gap-4 items-center w-full`}>
             <span className="flex justify-center items-center text-lg font-bold text-white h-12 w-12 rounded-full bg-gradient-to-r from-blue-400 via-blue-600 to-blue-800">
                 {ayah.number.inSurah}
             </span>
@@ -102,7 +114,7 @@ function Ayah(ayah:AyahProp){
                 </span>
             </div>
            </div>
-                <p className={`font-semibold ${dark?"text-blue-200":"text-blue-700"} ms-20`} style={{fontSize:fSize}}>{ayah.translation.en}</p>
+                <p className={`font-semibold ${dark?"text-blue-200":"text-blue-700"} `} style={{fontSize:fSize}}>{ayah.translation.en}</p>
            <div className="flex  justify-between items-center gap-4 w-full">
                 <span className="font-medium  text-lg bg-gradient-to-r from-indigo-500 via-indigo-500 to-indigo-500 text-white py-0.5 px-8 rounded-full" dir="rtl">page: {ayah.meta.page} - juz: {ayah.meta.juz}</span>
                 <span onClick={handleTafsir} className={`flex justify-center items-center h-12 w-12 rounded-lg ${tafsirOpen?"bg-blue-50":"bg-white"} border-2 border-blue-200 cursor-pointer transition-all duration-500 hover:bg-blue-50`}>

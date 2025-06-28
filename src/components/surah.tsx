@@ -24,11 +24,8 @@ function Surah() {
       const dispatch = useDispatch<AppDispatch>();
       const currentPath = useSelector((state: RootState) => state.CurrentPath.path);
 
-
-
-      // useEffect to handle data fetching and scrolling when surahNumber changes
       useEffect(() => {
-        if (surahNumber > 0) { // Ensure surahNumber is valid before fetching
+        if (surahNumber > 0) { 
           dispatch(getSurahs(surahNumber));
         }
         

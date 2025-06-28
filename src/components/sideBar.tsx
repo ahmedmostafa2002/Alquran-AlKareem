@@ -3,7 +3,6 @@ import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import SurahDetailsProps from '../utils/interfaces/surah_details.interface';
 import SurahDetails from './surah_details';
-import {v4 as uuid} from "uuid";
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../redux/store';
 import { useEffect, useState} from 'react';
@@ -37,13 +36,12 @@ function SideBar() {
 
   useEffect(() => {
     if ((isOpen || drawerOpen) && surahs.length > 0 && currentSurahNumber) {
-      const sidebarContent = document.querySelector(".sidebar-content"); // Add this class to your sidebar's content container
+        const sidebarContent = document.querySelector(".sidebar-content");
       const currentSurahElement = document.getElementById(`surah-${currentSurahNumber}`);
-      
       if (sidebarContent && currentSurahElement) {
           const sidebarRect = sidebarContent.getBoundingClientRect();
           const elementRect = currentSurahElement.getBoundingClientRect();
-          
+
           sidebarContent.scrollTo({
               top: elementRect.top - sidebarRect.top + sidebarContent.scrollTop,
               behavior: "smooth"
@@ -94,7 +92,7 @@ function SideBar() {
     <>
     {/* Keep the main sidebar div's class conditional on isOpen for width */}
     <div id='sidebar' className={`fixed text-center ${drawerOpen?'block':'hidden'} lg:block ${dark?"bg-gradient-to-b from-slate-900 via-gray-900 to-indigo-950":"bg-gradient-to-b from-purple-50 via-white to-white"} ${isOpen || drawerOpen ? 'shadow-md' : ''} ${isOpen || drawerOpen ? 'w-[80vw] lg:w-1/3 xl:w-1/4' : 'w-0'}
-    transition-all duration-500 ease-in-out h-screen ${drawerOpen?'pt-12':'pt-0'} flex flex-col`}>
+    transition-all duration-500 ease-in-out h-screen ${drawerOpen?'pt-12':'pt-0'} flex flex-col z-50`}>
     {(isOpen || drawerOpen) && (
     <>
     <div className='flex flex-col pt-12 items-start w-full flex-1'>
@@ -135,7 +133,7 @@ function SideBar() {
       <div className='flex flex-col gap-2 px-4 pb-20 w-full flex-1 sidebar-content overflow-y-auto max-h-[61vh]'> {/* Added flex-1 */}
         {surahs.map((surah)=>(
           (normalizeArabic(surah.name).includes(normalizeArabic(searchText))||surah.englishName.toLowerCase().includes(searchText.toLowerCase()))&&
-          <SurahDetails  key={uuid()} {...surah} />
+          <SurahDetails  key={surah.number} {...surah} />
         ))}
       </div>
       }
